@@ -1,0 +1,6 @@
+launch server on php 
+php -S localhost:8000 -t public
+
+
+clear cache after modifs 
+php bin/console cache:clear

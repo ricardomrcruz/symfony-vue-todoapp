@@ -26,7 +26,10 @@ class ToDoListController extends AbstractController
     public function getToDoList(): Response
     {
         $tasks = $this->entityManager -> getRepository(Task::class)->findAll();
-        return $this->json($tasks, Response::HTTP_OK);
+        
+        $response = $this->json($tasks, Response::HTTP_OK);
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        return $response;
     }
 
     #[Route('', name:'create', methods:['POST'])]
@@ -36,8 +39,8 @@ class ToDoListController extends AbstractController
         $data = json_decode((string) $request->getContent(), true);
 
         $task = new Task();
-        $task->setName('');
-        $task->setDescription('');
+        $task->setName($data['name'] );
+        $task->setDescription($data['description']);
         $task->setStatus(false);
 
         $entityManagerInterface->persist($task);
@@ -59,7 +62,7 @@ class ToDoListController extends AbstractController
         $task->setName($data['name'] ?? $task->getName());
         $task->setDescription($data['description'] ?? $task->getDescription());
         if (isset($data['status'])) {
-            $task->setStatus((bool)$data['status']);
+            $task->setStatus($data['status']);
         }
 
         $entityManager->flush();
