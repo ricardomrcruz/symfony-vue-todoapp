@@ -22,6 +22,12 @@ class Task
     #[ORM\Column]
     private ?bool $status = null;
 
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
+    private ?Project $project = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    private ?User $assignee = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -67,6 +73,28 @@ class Task
     {
         $this->status = $status;
 
+        return $this;
+    }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): self
+    {
+        $this->project = $project;
+        return $this;
+    }
+
+    public function getAssignee(): ?User
+    {
+        return $this->assignee;
+    }
+
+    public function setAssignee(?User $assignee): self
+    {
+        $this->assignee = $assignee;
         return $this;
     }
 }

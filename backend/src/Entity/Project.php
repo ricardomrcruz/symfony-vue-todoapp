@@ -34,8 +34,12 @@ class Project
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'projects')]
     private Collection $members;
 
-    #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist', 'remove'])]
-    private ?Comment $comment = null;
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Comment::class)]
+    private Collection $comments;
+
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class)]
+    private Collection $tasks;
+
 
     public function __construct()
     {
@@ -131,24 +135,57 @@ class Project
         return $this;
     }
 
-    public function getComment(): ?Comment
+    public function getComments(): Collection
     {
-        return $this->comment;
+        return $this->comments;
     }
 
-    public function setComment(?Comment $comment): static
+    public function addComment(Comment $comment): self
     {
-        // unset the owning side of the relation if necessary
-        if ($comment === null && $this->comment !== null) {
-            $this->comment->setProject(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($comment !== null && $comment->getProject() !== $this) {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
             $comment->setProject($this);
         }
 
-        $this->comment = $comment;
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            if ($comment->getProject() === $this) {
+                $comment->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTasks(Task $task): self
+    {
+        // set the owning side of the relation if necessary
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): self
+    {
+        // set the owning side of the relation if necessary
+        if ($this->tasks->removeElement($task)) {
+            if ($task->getProject() === $this) {
+                $task->setProject(null);
+            }
+        }
 
         return $this;
     }

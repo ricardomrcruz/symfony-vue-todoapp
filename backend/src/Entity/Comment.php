@@ -19,11 +19,12 @@ class Comment
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\OneToOne(inversedBy: 'comment', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $author = null;
 
-    #[ORM\OneToOne(inversedBy: 'comment', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Project $project = null;
 
     public function getId(): ?int
@@ -60,7 +61,7 @@ class Comment
         return $this->author;
     }
 
-    public function setAuthor(User $author): static
+    public function setAuthor(?User $author): static
     {
         $this->author = $author;
 

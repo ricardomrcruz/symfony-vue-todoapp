@@ -35,12 +35,13 @@ class User
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'members')]
     private Collection $projects;
 
-    #[ORM\OneToOne(mappedBy: 'author', cascade: ['persist', 'remove'])]
-    private ?Comment $comment = null;
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity:Comment::class)]
+    private Collection $comments;
 
     public function __construct()
     {
         $this->projects = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -135,20 +136,38 @@ class User
         return $this;
     }
 
-    public function getComment(): ?Comment
+    public function getComments(): Collection
     {
-        return $this->comment;
+        return $this->comments;
     }
 
-    public function setComment(Comment $comment): static
+    public function addComment(Comment $comment): self
     {
         // set the owning side of the relation if necessary
-        if ($comment->getAuthor() !== $this) {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
             $comment->setAuthor($this);
         }
 
-        $this->comment = $comment;
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        // set the owning side of the relation if necessary
+        if ($this->comments->removeElement($comment)) {
+            if($comment->getAuthor() === $this){
+            $comment->setAuthor(null);
+        }}
 
         return $this;
     }
+     
+
+
+
+
+
+
+
 }
