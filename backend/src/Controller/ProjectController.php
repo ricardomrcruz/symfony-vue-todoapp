@@ -34,24 +34,35 @@ class ProjectController extends AbstractController
     public function index(): JsonResponse
     {
         $projects = $this->projectRepository->findAll();
+        return $this->json($projects, context: ['groups' => ['projects:read']]);
+    }
 
-        $data = array_map(function ($project) {
-            return [
-                'id' => $project->getId(),
-                'name' => $project->getName(),
-                'description' => $project->getDescription(),
-                'status' => $project->getStatus(),
-                'deadline' => $project->getDeadline() ? $project->getDeadline()->format('Y-m-d H:i:s') : null,
-                'owner' => $project->getOwner(),
-                'members' => $project->getMembers()->map(fn($member) => [
-                    'id' => $member->getId(),
-                    'email' => $member->getEmail(),
-                    'firstName' => $member->getFirstName(),
-                    'lastName' => $member->getLastName(),
-                ])->toArray()
-            ];
-        }, $projects);
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(Project $project): JsonResponse
+    {
+        return $this->json($project, context: ['groups' => ['project:read']]);
+    }
 
-        return $this->json($data);
+
+    #[Route('/', name: 'create', methods: ['POST'])]
+    public function create(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $project = new Project();
+        $project->setName($data['name']);
+        $project->setDescription($data['description']);
+        $project->setStatus($data['status' ?? 'new']);
+        $project->setOwner($data['owner'] ?? null);
+
+
+        if (isset($data['deadline'])) {
+            $project->setDeadline(new \DateTime($data['deadline']));
+        }
+
+        $this->entityManager->persist($project);
+        $this->entityManager->flush();
+
+        return $this->json($project, 201, context: ['groups' => ['project:read']]);
     }
 }

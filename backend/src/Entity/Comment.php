@@ -4,6 +4,10 @@ namespace App\Entity;
 
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+
+
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
@@ -11,20 +15,25 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['project:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $content = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['project:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['project:read'])]
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['project:read'])]
     private ?Project $project = null;
 
     public function getId(): ?int

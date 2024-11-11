@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
@@ -14,30 +17,39 @@ class Project
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['project:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(['project:read'])]
     private ?\DateTimeInterface $deadline = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $owner = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'projects')]
+    #[Groups(['project:read'])]
     private Collection $members;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Comment::class)]
+    #[Groups(['project:read'])]
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class)]
+    #[Groups(['project:read'])]
     private Collection $tasks;
 
 

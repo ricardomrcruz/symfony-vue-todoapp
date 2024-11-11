@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -15,27 +18,35 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['project:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $email = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column(type: Types::JSON)]
+    #[Groups(['project:read'])]
     private array $roles = [];
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $lastName = null;
 
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'members')]
+    #[Groups(['project:read'])]
     private Collection $projects;
 
-    #[ORM\OneToMany(mappedBy: 'author', targetEntity:Comment::class)]
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class)]
+    #[Groups(['project:read'])]
     private Collection $comments;
 
     public function __construct()
@@ -156,18 +167,11 @@ class User
     {
         // set the owning side of the relation if necessary
         if ($this->comments->removeElement($comment)) {
-            if($comment->getAuthor() === $this){
-            $comment->setAuthor(null);
-        }}
+            if ($comment->getAuthor() === $this) {
+                $comment->setAuthor(null);
+            }
+        }
 
         return $this;
     }
-     
-
-
-
-
-
-
-
 }
