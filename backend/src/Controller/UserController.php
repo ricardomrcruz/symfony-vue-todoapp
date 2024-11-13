@@ -43,7 +43,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/', name: 'index', methods: ['GET'])]
+    #[Route('/', name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
 
@@ -83,5 +83,59 @@ class UserController extends AbstractController
         } catch (\Exception $e) {
             return $this->json(['error' => 'Invalid data submitted'], 400);
         }
+    }
+
+
+    #[Route('/{id}', name: 'update', methods: ['PUT'])]
+    public function update(Request $request, User $user): JsonResponse
+    {
+        try {
+
+            $data = json_decode($request->getContent(), true);
+
+            if (isset($data['email'])) {
+                // checks if email already exists
+                $existingUser = $this->userRepository->findOneBy(['email' => $data['email']]);
+                if ($existingUser && $existingUser->getId() !== $user->getId()) {
+                    return $this->json(['error' => 'Email already exists'], 400);
+                }
+                $user->setEmail($data['email']);
+            }
+
+            if (isset($data['password'])) {
+                $hashedPassword = $this->passwordHasher->hashPassword(
+                    $user,
+                    $data['password']
+                );
+                $user->setPassword($hashedPassword);
+            }
+
+            if (isset($data['firstName'])) {
+                $user->setFirstName($data['firstName']);
+            }
+
+            if (isset($data['lastName'])) {
+                $user->setLastName($data['lastName']);
+            }
+
+            if (isset($data['roles'])) {
+                $user->setRoles($data['roles']);
+            }
+
+            $this->entityManager->flush();
+
+            return $this->json($user, context: ['groups' => ['project:read']]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Invalid data provided'], 400);
+        }
+    }
+
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    public function delete(User $user): JsonResponse
+    {
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
+
+        return $this->json(null, 204);
     }
 }
