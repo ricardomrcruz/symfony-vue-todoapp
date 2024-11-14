@@ -31,7 +31,6 @@ const fetchTasks = async () => {
     const response = await axios.get<Task[]>('/api/tasks')
     console.log(response)
     tasks.value = response.data
-    
   } catch (error) {
     console.error('error fetching list', error)
   }

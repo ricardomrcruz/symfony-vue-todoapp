@@ -138,4 +138,20 @@ class UserController extends AbstractController
 
         return $this->json(null, 204);
     }
+
+    #[Route('/{id}/projects', name: 'user_projects_', methods: ['GET'])]
+    public function getUserProjects(User $user): JsonResponse
+    {
+        return $this->json($user->getProjects(), context: ['groups' => ['project:read']]);
+    }
+
+    #[Route('/{id}/tasks', name: 'user_tasks_', methods: ['GET'])]
+    public function getUserTasks(User $user): JsonResponse
+    {
+        $tasks = $this->entityManager
+            ->getRepository('App:Task')
+            ->findBy(['assignee' => $user]);
+
+        return $this->json($tasks, context: ['groups' => ['project:read']]);
+    }
 }
