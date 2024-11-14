@@ -27,7 +27,7 @@
       // After animation completes (adjust timing as needed)
       setTimeout(() => {
         this.$emit('animation-complete')
-      }, 3000) // 6 seconds for example
+      }, 2500) // 6 seconds for example
     },
     beforeDestroy() {
       if (this.animationFrame) {
@@ -79,7 +79,7 @@
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
   
-        if(this.time % 110 === 0) {
+        if(this.time % 100 === 0) {
           this.targetParticles = this.createTextParticles(this.words[this.currentWord])
           this.currentWord = (this.currentWord + 1) % this.words.length
         }
