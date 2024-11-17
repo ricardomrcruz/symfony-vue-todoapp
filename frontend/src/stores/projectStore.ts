@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
+import { handleError } from 'vue'
 
 interface Project {
   id: number
@@ -37,6 +38,13 @@ export const useProjectStore = defineStore('projects', {
   },
 
   actions: {
+    handleError(error: unknown): string {
+      if (axios.isAxiosError(error)) {
+        return error.response?.data?.error || error.message
+      }
+      return 'An expected error occurred'
+    },
+
     async fetchProjects() {
       this.loading = true
       this.error = null
